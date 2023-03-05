@@ -6,6 +6,7 @@ import 'package:shop_application/screens/product_detail_screen.dart';
 import '../providers/cart.dart';
 
 class ProducItem extends StatelessWidget {
+  static const routeName = '/products-overview';
   const ProducItem({super.key});
 
   // final String id;
@@ -48,6 +49,17 @@ class ProducItem extends StatelessWidget {
             color: Theme.of(context).hintColor,
             onPressed: () {
               cart.addItem(product.id, product.price, product.title);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: const Text(
+                  'Added a new Item!',
+                ),
+                duration: Duration(seconds: 2),
+                action: SnackBarAction(
+                    label: 'Undo',
+                    onPressed: () {
+                      cart.removeSingleItem(product.id);
+                    }),
+              ));
             },
           ),
         ),
