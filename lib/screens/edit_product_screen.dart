@@ -20,10 +20,37 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final _form = GlobalKey<FormState>();
   var _editProduct = Product(
       id: null.toString(), title: '', price: 0, description: '', imageUrl: '');
+  var _initValues = {
+    'title': '',
+    'description': '',
+    'price': '',
+    'imageUrl': ''
+  };
   @override
+  var _isInit = true;
   void initState() {
     _imageUrlFocusNode.addListener(_updateImageUrl);
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      final productId = ModalRoute.of(context)!.settings.arguments as String;
+      if (productId != null) {
+        _editProduct =
+            Provider.of<Products>(context, listen: false).findById(productId);
+        _initValues = {
+          'title': _editProduct.title,
+          'description': _editProduct.description,
+          'price': _editProduct.price.toString(),
+          'imageUrl': ''
+        };
+        _imageUrlControler.text=_editProduct.imageUrl;
+      }
+    }
+    _isInit = false;
+    super.didChangeDependencies();
   }
 
   void _updateImageUrl() {
@@ -46,7 +73,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       return;
     }
     _form.currentState!.save();
-    Provider.of<Products>(context, listen: false ).addProduct(_editProduct);
+    Provider.of<Products>(context, listen: false).addProduct(_editProduct);
     Navigator.of(context).pop();
   }
 
@@ -54,9 +81,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:const Text('Edit Product'),
+        title: const Text('Edit Product'),
         backgroundColor: Theme.of(context).primaryColor,
-        actions: [IconButton(onPressed: _saveForm, icon:const Icon(Icons.save))],
+        actions: [
+          IconButton(onPressed: _saveForm, icon: const Icon(Icons.save))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -65,6 +94,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             child: ListView(
               children: [
                 TextFormField(
+                  initialValue: _initValues['title'],
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5)),
@@ -96,6 +126,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   height: 15,
                 ),
                 TextFormField(
+                  initialValue: _initValues['price'],
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5)),
@@ -112,22 +143,22 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   },
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'Please provide a price';  
+                      return 'Please provide a price';
                     }
-                    if(double.tryParse(value)==null){
+                    if (double.tryParse(value) == null) {
                       return 'Please enter a valid number';
                     }
-                    if(double.parse(value)<=0){
+                    if (double.parse(value) <= 0) {
                       return 'Please enter number greater than zero';
                     }
                     return null;
-                
                   },
                 ),
                 const SizedBox(
                   height: 15,
                 ),
                 TextFormField(
+                  initialValue: _initValues['description'],
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5)),
@@ -162,7 +193,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                 ),
                               )),
                     Expanded(
-                      child: TextFormField(
+                      child: TextFormField( 
+                       
                         decoration: const InputDecoration(
                           label: Text(
                             'Image URL',
@@ -171,17 +203,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         ),
                         keyboardType: TextInputType.url,
                         textInputAction: TextInputAction.done,
-                        controller: _imageUrlControler,
                         focusNode: _imageUrlFocusNode,
+                        controller: _imageUrlControler,
                         onEditingComplete: () {
                           setState(() {});
                         },
                         onFieldSubmitted: (_) => _saveForm(),
-                        validator: (value){
-                          if(value!.isEmpty){
+                        validator: (value) {
+                          if (value!.isEmpty) {
                             return 'Please add an image url';
                           }
-                          if(!value.startsWith('http') && !value.startsWith('https')){
+                          if (!value.startsWith('http') &&
+                              !value.startsWith('https')) {
                             return 'Please  enter a valid URL';
                           }
                           return null;

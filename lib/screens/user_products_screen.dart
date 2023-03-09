@@ -7,7 +7,7 @@ import 'package:shop_application/widgets/user_product_item.dart';
 import '../providers/products_provider.dart';
 
 class UserProductScreen extends StatelessWidget {
-  static const routeName ='/user-products';
+  static const routeName = '/user-products';
   const UserProductScreen({super.key});
 
   @override
@@ -16,23 +16,29 @@ class UserProductScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Products'),
-        actions: [IconButton(onPressed: () {
-          Navigator.of(context).pushNamed(EditProductScreen.routeName );
-        }, icon: const Icon(Icons.add))],
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(EditProductScreen.routeName);
+              },
+              icon: const Icon(Icons.add))
+        ],
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: Padding( 
+      body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView.builder(
             itemCount: productsData.items.length,
             itemBuilder: (_, index) => Column(
-              children: [
-                UserProductItem(
-                    title: productsData.items[index].title,
-                    imageUrl: productsData.items[index].imageUrl),
-                    Divider()
-              ],
-            )),
+                  children: [
+                    UserProductItem(
+                      title: productsData.items[index].title,
+                      imageUrl: productsData.items[index].imageUrl,
+                      id: productsData.items[index].id,
+                    ),
+                   const Divider()
+                  ],
+                )),
       ),
     );
   }
